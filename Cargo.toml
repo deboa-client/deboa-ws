@@ -1,6 +1,6 @@
 [package]
 name = "deboa-ws"
-version = "0.1.0"
+version = "0.1.0-beta.2"
 edition = "2021"
 authors = ["Rogerio Araújo <rogerio.araujo@gmail.com>"]
 repository = "https://github.com/ararog/deboa-ws"
@@ -8,17 +8,19 @@ homepage = "https://github.com/ararog/deboa"
 description = "A friendly rest client on top of hyper."
 readme = "README.md"
 license = "MIT OR Apache-2.0"
+keywords = ["http", "networking", "client", "fetch", "rest-client"]
+publish = true
 rust-version = "1.85.0"
 
 [features]
 
-default = ["tokio"]
-tokio = ["dep:tokio", "hyper-util/tokio"]
-smol = ["dep:smol", "dep:smol-hyper"]
+default = ["runtime-tokio"]
+runtime-tokio = ["dep:tokio", "hyper-util/tokio"]
+runtime-smol = ["dep:smol", "dep:smol-hyper"]
 
 [dependencies]
 base64 = { version = "0.23.0" }
-deboa = { version = "0.1.3" }
+deboa = { version = "0.1.5-beta.1" }
 futures-util = { version = "0.3.31", default-features = false }
 http = "1"
 hyper = { version = "1.8.1", features = ["client"], default-features = false }
