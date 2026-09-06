@@ -14,10 +14,10 @@ use crate::errors::WebSocketError;
 pub mod errors;
 
 /// Smol runtime support
-#[cfg(feature = "smol")]
+#[cfg(feature = "runtime-smol")]
 pub mod smol;
 /// Tokio runtime support
-#[cfg(feature = "tokio")]
+#[cfg(feature = "runtime-tokio")]
 pub mod tokio;
 
 /// Result alias
@@ -81,11 +81,11 @@ impl WebsocketRequestBuilder for DeboaRequestBuilder {
     fn websocket<T: IntoUrl>(url: T) -> deboa::Result<DeboaRequestBuilder> {
         let rnd: [u8; 16] = rand::random();
         let key = STANDARD.encode(rnd);
-        Ok(DeboaRequest::at(url, Method::GET)?
-            .header(header::UPGRADE, "websocket")
-            .header(header::CONNECTION, "Upgrade")
-            .header(header::SEC_WEBSOCKET_KEY, &key)
-            .header(header::SEC_WEBSOCKET_VERSION, "13"))
+        DeboaRequest::at(url, Method::GET)?
+            .header(header::UPGRADE, "websocket")?
+            .header(header::CONNECTION, "Upgrade")?
+            .header(header::SEC_WEBSOCKET_KEY, &key)?
+            .header(header::SEC_WEBSOCKET_VERSION, "13")
     }
 }
 
