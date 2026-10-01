@@ -1,6 +1,5 @@
 //! WebSockets module
-use std::future::Future;
-
+use crate::errors::WebSocketError;
 use base64::{engine::general_purpose::STANDARD, Engine};
 use deboa::{
     request::{DeboaRequest, DeboaRequestBuilder},
@@ -8,8 +7,7 @@ use deboa::{
 };
 use http::{header, Method};
 use pin_project_lite::pin_project;
-
-use crate::errors::WebSocketError;
+use std::future::Future;
 
 pub mod errors;
 
@@ -36,7 +34,7 @@ pub type Result<T> = std::result::Result<T, WebSocketError>;
 pub enum Message {
     /// A text message
     Text(String),
-    /// BBinary message
+    /// A binary message
     Binary(Vec<u8>),
     /// Close message
     Close(u16, String),
@@ -62,7 +60,7 @@ pub trait WebsocketRequestBuilder {
     ///
     /// ``` compile_fail
     /// use deboa::{Client, Result, request::{IntoUrl, DeboaRequestBuilder}};
-    /// use deboa_extras::http::ws::request::{WebsocketRequestBuilder};
+    /// use deboa_ws::WebsocketRequestBuilder;
     ///
     /// let mut client = Client::new();
     /// let request = DeboaRequestBuilder::websocket("ws://example.com").unwrap();
@@ -106,7 +104,7 @@ pub trait IntoWebSocket {
     ///
     /// ``` compile_fail
     /// use deboa::{Client, Result, request::{IntoUrl, DeboaRequestBuilder}};
-    /// use deboa_smol::client::ws::request::{WebsocketRequestBuilder};
+    /// use deboa_ws::WebsocketRequestBuilder;
     ///
     /// let mut client = Client::new();
     /// let builder = DeboaRequestBuilder::websocket("ws://example.com").unwrap();
@@ -214,156 +212,5 @@ impl<T> WebSocket<T> {
     ///
     pub fn new(inner: T) -> Self {
         Self { inner }
-    }
-}
-
-impl<T> WebSocketExt for WebSocket<T>
-where
-    Self: WebSocketRead + WebSocketWrite,
-{
-    /// Sends a close frame to the WebSocket.
-    ///
-    /// # Arguments
-    ///
-    /// * `code` - The close code.
-    /// * `reason` - The close reason.
-    ///
-    /// # Returns
-    ///
-    /// A Result indicating success or a DeboaExtrasError.
-    ///
-    /// # Examples
-    ///
-    /// ```rust, compile_fail
-    /// let result = websocket.send_close(1000, "Goodbye").await;
-    /// if result.is_err() {
-    ///     output.send(Event::Disconnected).await;
-    ///     break;
-    /// }
-    /// ```
-    ///
-    /// # Panics
-    ///
-    /// This function may panic if the WebSocket frame processing fails.
-    ///
-    async fn send_close(&mut self, code: u16, reason: &str) -> Result<()> {
-        self.write_message(Message::Close(code, reason.to_string()))
-            .await
-    }
-
-    /// Sends a text frame to the WebSocket.
-    ///
-    /// # Arguments
-    ///
-    /// * `message` - The text message to send.
-    ///
-    /// # Returns
-    ///
-    /// A Result indicating success or a DeboaExtrasError.
-    ///
-    /// # Examples
-    ///
-    /// ```rust, compile_fail
-    /// let result = websocket.send_text("Hello").await;
-    /// if result.is_err() {
-    ///     output.send(Event::Disconnected).await;
-    ///     break;
-    /// }
-    /// ```
-    ///
-    /// # Panics
-    ///
-    /// This function may panic if the WebSocket frame processing fails.
-    ///
-    async fn send_text(&mut self, message: &str) -> Result<()> {
-        self.write_message(Message::Text(message.to_string()))
-            .await
-    }
-
-    /// Sends a binary frame to the WebSocket.
-    ///
-    /// # Arguments
-    ///
-    /// * `message` - The binary message to send.
-    ///
-    /// # Returns
-    ///
-    /// A Result indicating success or a DeboaError.
-    ///
-    /// # Examples
-    ///
-    /// ```rust, compile_fail
-    /// let result = websocket.send_binary(&[0x00, 0x01, 0x02]).await;
-    /// if result.is_err() {
-    ///     output.send(Event::Disconnected).await;
-    ///     break;
-    /// }
-    /// ```
-    ///
-    /// # Panics
-    ///
-    /// This function may panic if the WebSocket frame processing fails.
-    ///
-    async fn send_binary(&mut self, message: &[u8]) -> Result<()> {
-        self.write_message(Message::Binary(message.to_vec()))
-            .await
-    }
-
-    /// Sends a ping frame to the WebSocket.
-    ///
-    /// # Arguments
-    ///
-    /// * `message` - The ping message to send.
-    ///
-    /// # Returns
-    ///
-    /// A Result indicating success or a DeboaError.
-    ///
-    /// # Examples
-    ///
-    /// ```rust, compile_fail
-    /// let result = websocket.send_ping(&[0x00, 0x01, 0x02]).await;
-    /// if result.is_err() {
-    ///     output.send(Event::Disconnected).await;
-    ///     break;
-    /// }
-    /// ```
-    ///
-    /// # Panics
-    ///
-    /// This function may panic if the WebSocket frame processing fails.
-    ///
-    async fn send_ping(&mut self, message: &[u8]) -> Result<()> {
-        self.write_message(Message::Ping(message.to_vec()))
-            .await
-    }
-
-    /// Sends a pong frame to the WebSocket.
-    ///
-    /// # Arguments
-    ///
-    /// * `message` - The pong message to send.
-    ///
-    /// # Returns
-    ///
-    /// A Result indicating success or a DeboaError.
-    ///
-    /// # Examples
-    ///
-    /// ```rust, compile_fail
-    /// let result = websocket.send_pong(&[0x00, 0x01, 0x02]).await;
-    /// if result.is_err() {
-    ///     output.send(Event::Disconnected).await;
-    ///     break;
-    /// }
-    /// ```
-    ///
-    /// # Panics
-    ///
-    /// This function may panic if the WebSocket frame processing fails.
-    ///
-    async fn send_pong(&mut self, message: &[u8]) -> Result<()> {
-        self.write_message(Message::Pong(message.to_vec()))
-            .await
     }
 }

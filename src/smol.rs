@@ -65,7 +65,7 @@ impl WebSocketRead for WebSocket<FuturesIo<Upgraded>> {
     }
 }
 
-impl WebSocketWrite for &mut WebSocket<FuturesIo<Upgraded>> {
+impl WebSocketWrite for WebSocket<FuturesIo<Upgraded>> {
     async fn write_message(&mut self, message: Message) -> Result<()> {
         let mut tx_buf = vec![0; 10240];
         let mut tx_framer = WsTxFramer::new(true, &mut tx_buf);
@@ -97,6 +97,104 @@ impl WebSocketWrite for &mut WebSocket<FuturesIo<Upgraded>> {
         }
 
         Ok(())
+    }
+}
+
+impl WebSocketExt for WebSocket<FuturesIo<Upgraded>> {
+    /// Sends a close frame to the WebSocket.
+    ///
+    /// # Arguments
+    ///
+    /// * `code` - The close code.
+    /// * `reason` - The close reason.
+    ///
+    /// # Returns
+    ///
+    /// A Result indicating success or a DeboaExtrasError.
+    ///
+    /// # Panics
+    ///
+    /// This function may panic if the WebSocket frame processing fails.
+    ///
+    async fn send_close(&mut self, code: u16, reason: &str) -> Result<()> {
+        self.write_message(Message::Close(code, reason.to_string()))
+            .await
+    }
+
+    /// Sends a text frame to the WebSocket.
+    ///
+    /// # Arguments
+    ///
+    /// * `message` - The text message to send.
+    ///
+    /// # Returns
+    ///
+    /// A Result indicating success or a DeboaExtrasError.
+    ///
+    /// # Panics
+    ///
+    /// This function may panic if the WebSocket frame processing fails.
+    ///
+    async fn send_text(&mut self, message: &str) -> Result<()> {
+        self.write_message(Message::Text(message.to_string()))
+            .await
+    }
+
+    /// Sends a binary frame to the WebSocket.
+    ///
+    /// # Arguments
+    ///
+    /// * `message` - The binary message to send.
+    ///
+    /// # Returns
+    ///
+    /// A Result indicating success or a DeboaError.
+    ///
+    /// # Panics
+    ///
+    /// This function may panic if the WebSocket frame processing fails.
+    ///
+    async fn send_binary(&mut self, message: &[u8]) -> Result<()> {
+        self.write_message(Message::Binary(message.to_vec()))
+            .await
+    }
+
+    /// Sends a ping frame to the WebSocket.
+    ///
+    /// # Arguments
+    ///
+    /// * `message` - The ping message to send.
+    ///
+    /// # Returns
+    ///
+    /// A Result indicating success or a DeboaError.
+    ///
+    /// # Panics
+    ///
+    /// This function may panic if the WebSocket frame processing fails.
+    ///
+    async fn send_ping(&mut self, message: &[u8]) -> Result<()> {
+        self.write_message(Message::Ping(message.to_vec()))
+            .await
+    }
+
+    /// Sends a pong frame to the WebSocket.
+    ///
+    /// # Arguments
+    ///
+    /// * `message` - The pong message to send.
+    ///
+    /// # Returns
+    ///
+    /// A Result indicating success or a DeboaError.
+    ///
+    /// # Panics
+    ///
+    /// This function may panic if the WebSocket frame processing fails.
+    ///
+    async fn send_pong(&mut self, message: &[u8]) -> Result<()> {
+        self.write_message(Message::Pong(message.to_vec()))
+            .await
     }
 }
 
