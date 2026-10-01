@@ -28,7 +28,18 @@ deboa-ws = { version = "0.1.1", features = "runtime-tokio" }
 ## Usage
 
 ```rust, ignore
+use deboa::{Client, Result, request::{IntoUrl, DeboaRequestBuilder}};
+use deboa_extras::http::ws::request::{WebsocketRequestBuilder};
 
+let mut client = Client::new();
+let request = DeboaRequestBuilder::websocket("ws://example.com").unwrap();
+let response = request.send_with(&mut client).await.unwrap();
+let ws = response.into_websocket().unwrap();
+loop {
+    if let Ok(Some(message)) = ws.read_message().await {
+        println!("message: {}", message);
+    }
+}
 ```
 
 ## License
