@@ -19,20 +19,20 @@ runtime-smol = ["dep:smol", "dep:smol-hyper"]
 
 [dependencies]
 base64 = { version = "0.23.0" }
-#deboa = { path = "../deboa/deboa" }
-deboa = { version = "0.1.5-beta.2" }
+deboa = { path = "../deboa/deboa" }
+#deboa = { version = "0.1.5-beta.2" }
 futures-util = { version = "0.3.31", default-features = false }
 http = "1"
 hyper = { version = "1.11.1", features = ["client"], default-features = false }
 hyper-body-utils = { version = "0.1.17", features = ["generic"], default-features = false }
-hyper-util = { version = "0.1.20", features = [
+hyper-util = { version = "0.1.21", features = [
   "client",
   "client-legacy",
 ], default-features = false }
 pin-project-lite = "0.2.17"
-rand = "0.10.2"
+rand = "0.10.3"
 smol = { version = "2.0.2", optional = true, default-features = false }
 smol-hyper = { version = "0.1.0", optional = true, default-features = false }
-thiserror = "2.0.20"
+thiserror = "2.0.21"
 tokio = { version = "1.53.1", optional = true, features = ["io-std"] }
 ws-framer = { version = "0.3.2" }
