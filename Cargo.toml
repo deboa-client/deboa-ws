@@ -24,7 +24,8 @@ deboa = { path = "../deboa/deboa" }
 futures-util = { version = "0.3.31", default-features = false }
 http = "1"
 hyper = { version = "1.11.1", features = ["client"], default-features = false }
-hyper-body-utils = { version = "0.1.17", features = ["generic"], default-features = false }
+hyper-body-utils = { path = "../hyper-body-utils", default-features = false }
+#hyper-body-utils = { version = "0.1.17", default-features = false }
 hyper-util = { version = "0.1.21", features = [
   "client",
   "client-legacy",

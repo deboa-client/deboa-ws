@@ -29,7 +29,7 @@ deboa-ws = { version = "0.1.1", features = "runtime-tokio" }
 
 ```rust, ignore
 use deboa::{Client, Result, request::{IntoUrl, DeboaRequestBuilder}};
-use deboa_extras::http::ws::request::{WebsocketRequestBuilder};
+use deboa_ws::request::{WebsocketRequestBuilder};
 
 let mut client = Client::new();
 let request = DeboaRequestBuilder::websocket("ws://example.com").unwrap();
