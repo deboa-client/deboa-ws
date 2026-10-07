@@ -7,7 +7,10 @@ use deboa::{
 };
 use http::{header, Method};
 use pin_project_lite::pin_project;
-use std::future::Future;
+use std::{
+    future::Future,
+    sync::{Arc, Mutex},
+};
 
 pub mod errors;
 
@@ -211,6 +214,50 @@ impl<T> WebSocket<T> {
     /// A WebSocket struct.
     ///
     pub fn new(inner: T) -> Self {
-        Self { inner }
+        Self { inner: inner }
+    }
+
+    pub fn split(self) -> (WebSocketReader<T>, WebSocketWriter<T>)
+    where
+        Self: WebSocketRead + WebSocketWrite,
+    {
+        let inner_arc = Arc::new(Mutex::new(self));
+        (WebSocketReader(inner_arc.clone()), WebSocketWriter(inner_arc))
+    }
+}
+
+pub struct WebSocketReader<T>(pub(crate) Arc<Mutex<WebSocket<T>>>);
+
+impl<T> WebSocketRead for WebSocketReader<T>
+where
+    T: WebSocketRead,
+{
+    async fn read_message(&mut self) -> Result<Option<Message>> {
+        let mut guard = self
+            .0
+            .lock()
+            .map_err(|e| WebSocketError::ReceiveMessage { message: e.to_string() })?;
+        guard
+            .inner
+            .read_message()
+            .await
+    }
+}
+
+pub struct WebSocketWriter<T>(pub(crate) Arc<Mutex<WebSocket<T>>>);
+
+impl<T> WebSocketWrite for WebSocketWriter<T>
+where
+    T: WebSocketWrite,
+{
+    async fn write_message(&mut self, message: Message) -> Result<()> {
+        let mut guard = self
+            .0
+            .lock()
+            .map_err(|e| WebSocketError::ReceiveMessage { message: e.to_string() })?;
+        guard
+            .inner
+            .write_message(message)
+            .await
     }
 }
