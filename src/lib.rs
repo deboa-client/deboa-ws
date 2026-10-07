@@ -12,6 +12,9 @@ use std::{
     sync::{Arc, Mutex},
 };
 
+#[cfg(test)]
+pub mod tests;
+
 pub mod errors;
 
 /// Smol runtime support
@@ -33,7 +36,7 @@ pub type Result<T> = std::result::Result<T, WebSocketError>;
 /// * `Close(u16, String)` - A close message.
 /// * `Ping(Vec<u8>)` - A ping message.
 /// * `Pong(Vec<u8>)` - A pong message.
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Message {
     /// A text message
     Text(String),
