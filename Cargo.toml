@@ -19,11 +19,9 @@ runtime-smol = ["dep:smol", "dep:smol-hyper"]
 
 [dependencies]
 base64 = { version = "0.23.0" }
-deboa = { version = "0.1.5-beta.3" }
-futures-util = { version = "0.3.31", default-features = false }
+deboa = { version = "0.1.5-beta.5" }
 http = "1"
 hyper = { version = "1.11.1", features = ["client"], default-features = false }
-hyper-body-utils = { version = "0.1.18", default-features = false }
 hyper-util = { version = "0.1.21", features = [
   "client",
   "client-legacy",
