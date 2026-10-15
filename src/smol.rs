@@ -1,6 +1,5 @@
 use crate::{
-    errors::WebSocketError, IntoWebSocket, Message, Result, WebSocket, WebSocketRead,
-    WebSocketWrite,
+    IntoWebSocket, Message, Result, WebSocket, WebSocketExt, WebSocketRead, WebSocketWrite, errors::WebSocketError,
 };
 use deboa::{
     errors::{ConnectionError, DeboaError},
