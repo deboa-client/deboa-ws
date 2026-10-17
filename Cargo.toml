@@ -1,6 +1,6 @@
 [package]
 name = "deboa-ws"
-version = "0.1.0-beta.4"
+version = "0.1.0-beta.5"
 edition = "2021"
 authors = ["Rogerio Araújo <rogerio.araujo@gmail.com>"]
 repository = "https://github.com/ararog/deboa-ws"
@@ -19,7 +19,7 @@ runtime-smol = ["dep:smol", "dep:smol-hyper"]
 
 [dependencies]
 base64 = { version = "0.23.0" }
-deboa = { version = "0.1.5-beta.5" }
+deboa = { version = "0.1.5-beta.7" }
 http = "1"
 hyper = { version = "1.11.1", features = ["client"], default-features = false }
 hyper-util = { version = "0.1.21", features = [
