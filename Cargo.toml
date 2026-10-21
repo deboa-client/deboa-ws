@@ -13,7 +13,7 @@ publish = true
 rust-version = "1.85.0"
 
 [features]
-default = ["runtime-tokio"]
+default = ["runtime-smol"]
 runtime-tokio = ["dep:tokio", "hyper-util/tokio"]
 runtime-smol = ["dep:smol", "dep:smol-hyper"]
 
