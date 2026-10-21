@@ -25,7 +25,7 @@ jobs:
 
       - name: Generate code coverage
         run: |
-          CARGO_INCREMENTAL=0 cargo +nightly tarpaulin --verbose --workspace --timeout 120 --engine llvm --features "${{ matrix.feature }}" --out Xml --output-dir ./target/tarpaulin -- --test-threads 1
+          CARGO_INCREMENTAL=0 cargo +nightly tarpaulin --verbose --workspace --timeout 120 --engine llvm --features "${{ matrix.feature }}" --no-default-features --out Xml --output-dir ./target/tarpaulin -- --test-threads 1
 
       - name: Upload to codecov.io
         uses: codecov/codecov-action@v7
