@@ -35,7 +35,7 @@ impl WebSocketRead for WebSocket<TokioIo<Upgraded>> {
 
         let bytes_read = self
             .inner
-            .read(rx_framer.mut_buf())
+            .read(rx_framer.read_buf())
             .await;
         if bytes_read.is_err() {
             return Err(WebSocketError::ReceiveMessage {
@@ -44,9 +44,9 @@ impl WebSocketRead for WebSocket<TokioIo<Upgraded>> {
         }
 
         let bytes_read = bytes_read.unwrap();
-        rx_framer.revolve_write_offset(bytes_read);
-        let res = rx_framer.process_data();
-        let message = if let Some(frame) = res {
+        rx_framer.advance(bytes_read);
+        let res = rx_framer.next_frame();
+        let message = if let Some(Ok(frame)) = res {
             #[allow(clippy::collapsible_match)]
             match frame {
                 WsFrame::Text(data) => Some(Message::Text(data.to_string())),
@@ -69,20 +69,20 @@ impl WebSocketWrite for WebSocket<TokioIo<Upgraded>> {
         let mut tx_framer = WsTxFramer::new(true, &mut tx_buf);
 
         let result = match message {
-            Message::Text(data) => {
-                self.write_all(tx_framer.frame(WsFrame::Text(&data)))
+            Message::Text(data) if let Some(bytes) = tx_framer.frame(WsFrame::Text(&data)) => {
+                self.write_all(bytes)
                     .await
             }
-            Message::Binary(data) => {
-                self.write_all(tx_framer.frame(WsFrame::Binary(&data)))
+            Message::Binary(data) if let Some(bytes) = tx_framer.frame(WsFrame::Binary(&data)) => {
+                self.write_all(bytes)
                     .await
             }
-            Message::Close(code, reason) => {
-                self.write_all(tx_framer.frame(WsFrame::Close(code, &reason)))
+            Message::Close(code, reason) if let Some(bytes) = tx_framer.frame(WsFrame::Close(code, &reason)) => {
+                self.write_all(bytes)
                     .await
             }
-            Message::Ping(data) => {
-                self.write_all(tx_framer.frame(WsFrame::Ping(&data)))
+            Message::Ping(data) if let Some(bytes) = tx_framer.frame(WsFrame::Ping(&data)) => {
+                self.write_all(bytes)
                     .await
             }
             _ => Ok(()),
