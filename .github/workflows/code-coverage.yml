@@ -1,5 +1,8 @@
 name: Code Coverage
 
+permissions:
+  contents: read
+  
 on:
   push:
     branches:
@@ -9,6 +12,10 @@ jobs:
   cover:
     name: coverage
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Defina aqui todas as suas features exclusivas
+        feature: [runtime-tokio, runtime-smol]    
     container:
       image: xd009642/tarpaulin:develop-nightly
       options: --security-opt seccomp=unconfined --hostname=localhost
@@ -18,10 +25,13 @@ jobs:
 
       - name: Generate code coverage
         run: |
-          CARGO_INCREMENTAL=0 cargo +nightly tarpaulin --verbose --workspace --timeout 120 --engine llvm --out xml -- --test-threads 1
+          CARGO_INCREMENTAL=0 cargo +nightly tarpaulin --verbose --workspace --timeout 120 --engine llvm --features "${{ matrix.feature }}" --out Xml --output-dir ./target/tarpaulin -- --test-threads 1
 
       - name: Upload to codecov.io
         uses: codecov/codecov-action@v7
         with:
           token: ${{secrets.CODECOV_TOKEN}}
+          files: ./target/tarpaulin/cobertura.xml
+          flags: ${{ matrix.feature }} # Separa os relatórios no painel do Codecov
+          name: coverage-${{ matrix.feature }}          
           fail_ci_if_error: true
